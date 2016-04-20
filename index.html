@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.17.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.17.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; font: 15px/20px sans-serif; }
+        .overlay {
+          padding: 10px;
+          position: absolute;
+          bottom: 0px;
+            left: 0px;
+              right: 0px;
+                background: #fff;
+
+
+        }
+
+        .button {
+          display:inline-block;
+            font-size: 30px;
+              padding:5px;
+        }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<div class='overlay'>
+  <div style='display:inline-block;padding:5px 20px;'>
+    <h2>Name that country!</h2>
+    <p>What country is highlighted in orange?</p>
+  </div>
+  <button class='button' id='one'></button>
+  <button class='button' id='two'></button>
+  <button class='button' id='three'></button>
+</div>
+<script src='names.js'></script>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoidG1jdyIsImEiOiJIZmRUQjRBIn0.lRARalfaGHnPdRcc-7QZYQ';
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/mapbox/streets-v8', //stylesheet location
+    center: [78.8818359375, 22.2280904167845], // starting position
+    zoom: 3 // starting zoom
+});
+
+var rand = names[Math.floor(Math.random() * names.length)];
+var other = names[Math.floor(Math.random() * names.length)];
+var other2 = names[Math.floor(Math.random() * names.length)];
+
+document.getElementById('one').innerText = rand;
+document.getElementById('two').innerText = other;
+document.getElementById('three').innerText = other2;
+
+map.on('style.load', function() {
+  map.addSource('maine', {
+    type: 'geojson',
+    data: 'ne_50m_admin_0_countries.geojson'
+  });
+  map.addLayer({
+      'id': 'route',
+      'type': 'fill',
+      'source': 'maine',
+      'layout': {},
+      'filter': ['==', 'name', rand],
+      'paint': {
+          'fill-color': '#EFAF27',
+          'fill-opacity': 1
+      }
+  }, 'country-label-lg');
+});
+</script>
+
+</body>
+</html>
