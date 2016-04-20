@@ -100,7 +100,8 @@ var setup = function() {
   map.setFilter('highlighted-country', ['==', 'name', target]);
 
   countryLabels.forEach(function(layer) {
-    map.setFilter(layer[0], [['!=', 'name_en', target], layer[1]]);
+    var filter = ['all', ['!=', 'name_en', target], layer[1]];
+    map.setFilter(layer[0], filter);
   });
 
   map.fitBounds(boundsByName[target]);
