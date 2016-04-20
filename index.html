@@ -49,30 +49,88 @@ var map = new mapboxgl.Map({
     zoom: 3 // starting zoom
 });
 
-var rand = names[Math.floor(Math.random() * names.length)];
-var other = names[Math.floor(Math.random() * names.length)];
-var other2 = names[Math.floor(Math.random() * names.length)];
+var divs = [
+  document.getElementById('one'),
+  document.getElementById('two'),
+  document.getElementById('three')
+];
 
-document.getElementById('one').innerText = rand;
-document.getElementById('two').innerText = other;
-document.getElementById('three').innerText = other2;
+names.forEach(function(name) {
+  boundsByName[name] = [
+    [
+      boundsByName[name][0][0] - .5,
+      boundsByName[name][0][1] - .5
+    ],
+    [
+      boundsByName[name][1][0] + .5,
+      boundsByName[name][1][1] + .5
+    ]
+  ]
+});
+
+var target = '';
+var options = [];
+
+divs.forEach(function(div, i) {
+  div.onclick = function(){
+    alert(options[i] === target);
+    setup();
+  }
+});
+
+var countryLabels = [
+  ['country-label-lg', [ "in", "scalerank", 1,2]],
+  ['country-label-md', [ "in", "scalerank", 3,4]],
+  ['country-label-sm', [ "==", "scalerank", 5]]
+];
+
+var setup = function() {
+  options = [];
+  options.push(names[Math.floor(Math.random() * names.length)]);
+  options.push(names[Math.floor(Math.random() * names.length)]);
+  while(options.length < divs.length) {
+    options.push(names[Math.floor(Math.random() * names.length)]);
+    options = options.filter(function(opt, idx) {
+      return options.indexOf(opt) == idx;
+    });
+  }
+
+  target = options[0];
+
+  map.setFilter('highlighted-country', ['==', 'name', target]);
+
+  countryLabels.forEach(function(layer) {
+    map.setFilter(layer[0], [['!=', 'name_en', target], layer[1]]);
+  });
+
+  map.fitBounds(boundsByName[target]);
+
+  options.sort();
+
+  for (var i=0; i<options.length; i++) {
+    divs[i].innerText = options[i];
+  }
+
+}
 
 map.on('style.load', function() {
-  map.addSource('maine', {
+  map.addSource('countries', {
     type: 'geojson',
     data: 'ne_50m_admin_0_countries.geojson'
   });
   map.addLayer({
-      'id': 'route',
+      'id': 'highlighted-country',
       'type': 'fill',
-      'source': 'maine',
+      'source': 'countries',
       'layout': {},
-      'filter': ['==', 'name', rand],
+      'filter': ['==', 'name', ''],
       'paint': {
           'fill-color': '#EFAF27',
           'fill-opacity': 1
       }
   }, 'country-label-lg');
+
+  setup();
 });
 </script>
 
